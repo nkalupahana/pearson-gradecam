@@ -3,10 +3,12 @@
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 </head>
 
 <body class="container">
     <h4>Upload your test below.</h4>
+    <p id="testname"></p>
     <br>
     <div class="row">
         <div class="row" style="margin-bottom: 0px;">
@@ -39,7 +41,18 @@
 </body>
 
 <script>
-    firebase.auth().signOut();
+    if (document.readyState != 'loading') {
+        ready();
+    } else {
+        document.addEventListener('DOMContentLoaded', ready);
+    }
+
+    function ready() {
+        firebase.auth().signOut();
+        firebase.database().ref("/name").once("value", (snap) => {
+            document.getElementById("testname").innerHTML = "Currently uploaded test: " + snap.val();
+        })
+    }
 
     function upload() {
         let btn = document.getElementById("upload");
@@ -48,10 +61,14 @@
 
         firebase.auth().signInWithEmailAndPassword("pearsoli@hsd.k12.or.us", document.getElementById("password").value)
             .catch(function (error) {
-                alert("Password invalid!");
                 btn.disabled = false;
                 btn.innerHTML = "Upload";
                 firebase.auth().signOut();
+                Swal.fire(
+                    'Whoops!',
+                    'Password invalid!',
+                    'error'
+                );
             })
     }
 
@@ -65,7 +82,13 @@
                 btn.disabled = false;
                 btn.innerHTML = "Upload";
                 firebase.auth().signOut();
-                alert("Uploaded!");
+                Swal.fire(
+                    'Success!',
+                    'Test uploaded!',
+                    'success'
+                ).then(() => {
+                    window.location.reload();
+                });
             });
         }
     });
