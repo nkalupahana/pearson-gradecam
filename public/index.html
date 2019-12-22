@@ -1,1 +1,185 @@
-WIP
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="https://cdn.jsdelivr.net/gh/ded/reqwest@2.0.5/reqwest.min.js"></script>
+
+    <style>
+        td {
+            border-radius: 0px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="preload">
+        <br><br><br>
+        <center>
+            <div class="preloader-wrapper big active">
+                <div class="spinner-layer spinner-blue">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+
+                <div class="spinner-layer spinner-red">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+
+                <div class="spinner-layer spinner-yellow">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+
+                <div class="spinner-layer spinner-green">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+            </div>
+            <br><br>
+            <p>Retrieving test results...</p>
+        </center>
+    </div>
+
+    <div id="postload" class="container" style="display: none;">
+        <br>
+        <h4 id="testnameoutput">Test name!</h4>
+        <h6 id="scoreoutput">Your score: </h6> <!-- TODO: Tack version on here -->
+        <a onclick="window.location.reload()">Sign Out</a>
+        <br>
+        <table style="width: 200px" class="centered">
+            <tbody id="tfill">
+                <tr>
+                    <td>#</td>
+                    <td>Ans</td>
+                    <td>Key</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/__/firebase/7.6.1/firebase-app.js"></script>
+    <script src="/__/firebase/7.6.1/firebase-database.js"></script>
+    <script src="/__/firebase/init.js"></script>
+
+    <script>
+        if (document.readyState != 'loading') {
+            ready();
+        } else {
+            document.addEventListener('DOMContentLoaded', ready);
+        }
+
+        function ready() {
+            firebase.database().ref("/name").once("value", async (snap) => {
+                let ans = await Swal.fire({
+                    title: "Login",
+                    customClass: {
+                        input: "browser-default"
+                    },
+                    html: `<p>Please login with your StudentVUE login below to get your results for ${snap.val()}. If you don't know your login, you can get it reset at the main office.</p><input type="text" placeholder="Username (lastf123)" id="swal-input1" class="swal2-input"><input type="password" placeholder="Password" id="swal-input2" class="swal2-input">`,
+                    allowOutsideClick: false,
+                    showLoaderOnConfirm: true,
+                    showCancelButton: false,
+                    preConfirm: async () => {
+                        let result = await new Promise((resolve,
+                            reject) => {
+                            reqwest({
+                                url: "/report",
+                                type: 'json',
+                                method: "POST",
+                                crossOrigin: true,
+                                data: {
+                                    username: document.getElementById(
+                                            "swal-input1")
+                                        .value,
+                                    password: document.getElementById(
+                                            "swal-input2")
+                                        .value,
+                                },
+                                error: function (err) {
+                                    console.warn(
+                                        err);
+                                    reject(err)
+                                },
+                                success: function (
+                                    resp) {
+                                    resolve(resp);
+                                }
+                            })
+                        })
+
+                        if (result.error) {
+                            Swal.showValidationMessage(result.error);
+                        } else {
+                            return result;
+                        }
+                    }
+                })
+
+                if (!ans.dismiss) {
+                    console.log(ans.value);
+                    document.getElementById("preload").style.display = "none";
+                    document.getElementById("postload").style.display = "block";
+                    studentAns = ans.value.student.split(",").slice(9);
+                    key = ans.value.key.split(",").slice(9);
+                    console.log(studentAns);
+                    console.log(key);
+                    document.getElementById("testnameoutput").innerHTML = snap.val();
+
+                    for (let i = 0; i < key.length; i++) {
+                        let color = "";
+                        if (studentAns[i] == key[i]) {
+                            color = "#a5d6a7";
+                        } else {
+                            color = "#ef9a9a";
+                        }
+
+                        document.getElementById("tfill").innerHTML += `
+                            <tr style="background-color: ${color}">
+                                <td>${i + 1}</td>
+                                <td>${studentAns[i]}</td>
+                                <td>${key[i]}</td>
+                            </tr>
+                        `
+                    }
+
+                    document.getElementById("scoreoutput").innerHTML = `Score: ${ans.value.student.split(",")[8]}/${key.length} (Version ${ans.value.key.split(",")[7]})`;
+                } else {
+                    window.location.reload();
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
