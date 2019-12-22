@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "name": {
+      ".read": true,
+      ".write": "auth.uid == 'HapAxfvJnUaiGg0125FW4nOhtWv1'"
+    },
+    ".read": "auth.uid == 'HapAxfvJnUaiGg0125FW4nOhtWv1'",
+    ".write": "auth.uid == 'HapAxfvJnUaiGg0125FW4nOhtWv1'"
+  }
+}

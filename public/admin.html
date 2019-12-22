@@ -1,0 +1,74 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+
+<body class="container">
+    <h4>Upload your test below.</h4>
+    <br>
+    <div class="row">
+        <div class="row" style="margin-bottom: 0px;">
+            <div class="input-field col s12">
+                <input id="password" type="password">
+                <label for="password">Password</label>
+            </div>
+        </div>
+        <div class="row" style="margin-bottom: 0px;">
+            <div class="input-field col s12">
+                <input placeholder="Unit 0: Roll Tide" id="name" type="text">
+                <label for="name">Test Name</label>
+            </div>
+        </div>
+        <div class="col s12">
+            <div class="row" style="margin-bottom: 0px;">
+                <div class="input-field col s12">
+                    <textarea id="ta1" class="materialize-textarea"></textarea>
+                    <label for="ta1">Test Info CSV</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a onclick="upload()" id="upload" class="waves-effect waves-light btn">Upload</a>
+
+    <script src="/__/firebase/7.6.1/firebase-app.js"></script>
+    <script src="/__/firebase/7.6.1/firebase-auth.js"></script>
+    <script src="/__/firebase/7.6.1/firebase-database.js"></script>
+    <script src="/__/firebase/init.js"></script>
+</body>
+
+<script>
+    firebase.auth().signOut();
+
+    function upload() {
+        let btn = document.getElementById("upload");
+        btn.disabled = true;
+        btn.innerHTML = "Please wait";
+
+        firebase.auth().signInWithEmailAndPassword("pearsoli@hsd.k12.or.us", document.getElementById("password").value)
+            .catch(function (error) {
+                alert("Password invalid!");
+                btn.disabled = false;
+                btn.innerHTML = "Upload";
+                firebase.auth().signOut();
+            })
+    }
+
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            firebase.database().ref("/").update({
+                name: document.getElementById("name").value,
+                csv: document.getElementById("ta1").value
+            }).then(() => {
+                let btn = document.getElementById("upload");
+                btn.disabled = false;
+                btn.innerHTML = "Upload";
+                firebase.auth().signOut();
+                alert("Uploaded!");
+            });
+        }
+    });
+</script>
+
+</html>
