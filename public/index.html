@@ -170,10 +170,11 @@
                                 <td>${studentAns[i]}</td>
                                 <td>${key[i]}</td>
                             </tr>
-                        `
+                        `;
                     }
 
-                    document.getElementById("scoreoutput").innerHTML = `Score: ${ans.value.student.split(",")[8]}/${key.length} (Version ${ans.value.key.split(",")[7]})`;
+                    document.getElementById("scoreoutput").innerHTML =
+                        `Score: ${ans.value.student.split(",")[8]}/${key.length} (Version ${ans.value.key.split(",")[7]})`;
                 } else {
                     window.location.reload();
                 }
