@@ -106,7 +106,7 @@
                     customClass: {
                         input: "browser-default"
                     },
-                    html: `<p>Please login with your StudentVUE login below to get your results for ${snap.val()}. If you don't know your login, you can get it reset at the main office.</p><input type="text" placeholder="Username (lastf123)" id="swal-input1" class="swal2-input"><input type="password" placeholder="Password" id="swal-input2" class="swal2-input">`,
+                    html: `<p>Please login with your StudentVUE login below to get your results for <b>${snap.val()}</b>. If you don't know your login, you can get it reset at the main office.</p><input type="text" placeholder="Username (lastf123)" id="swal-input1" class="swal2-input"><input type="password" placeholder="Password" id="swal-input2" class="swal2-input">`,
                     allowOutsideClick: false,
                     showLoaderOnConfirm: true,
                     showCancelButton: false,
@@ -154,7 +154,7 @@
                     key = ans.value.key.split(",").slice(9);
                     console.log(studentAns);
                     console.log(key);
-                    document.getElementById("testnameoutput").innerHTML = snap.val();
+                    document.getElementById("testnameoutput").innerHTML = snap.val() + " Results";
 
                     for (let i = 0; i < key.length; i++) {
                         let color = "";
